@@ -1,98 +1,242 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Tech Solutions — Backend API (Gestión de Proyectos)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API backend del sistema de gestión de proyectos para la empresa ficticia **Tech Solutions**, desarrollada con fines académicos para el **Instituto Profesional IPSS** como parte de la **Evaluación Sumativa de la Unidad Nº 2** de la asignatura **Desarrollo de Software Web I — Sección 51**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+| | |
+| :--- | :--- |
+| **Desarrolladora** | Gina Norambuena Sánchez |
+| **Docente** | Boris Belmar |
+| **Asignatura** | Desarrollo de Software Web I — Sección 51 |
+| **Institución** | Instituto Profesional IPSS |
 
-## Description
+Este repositorio contiene el **backend**. El frontend (Next.js 15) se encuentra en `front-tech-solutions-IPSS`.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## Tabla de contenidos
+
+- [Características](#características)
+- [Tecnologías](#tecnologías)
+- [Requisitos](#requisitos)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Variables de entorno](#variables-de-entorno)
+- [Arquitectura](#arquitectura)
+- [Justificación de tecnologías](#justificación-de-tecnologías)
+- [Documentación interactiva (Swagger)](#documentación-interactiva-swagger)
+- [Endpoints](#endpoints)
+- [Pruebas](#pruebas)
+- [Capturas de pantalla](#capturas-de-pantalla)
+
+---
+
+## Características
+
+- **Registro de usuarios** con contraseña cifrada mediante **bcrypt**.
+- **Inicio de sesión** que retorna un **JWT** firmado.
+- **Autenticación por JWT** en las rutas protegidas (`JwtAuthGuard` + passport-jwt).
+- **CRUD de proyectos** (crear, listar, actualizar, eliminar) asociados al usuario autenticado (`created_by`).
+- **Validación de datos** con class-validator (mensajes en español) y `ValidationPipe` global.
+- **Prisma ORM** sobre **MySQL 8** con Docker Compose.
+- **Seed** con usuario demo y proyectos de datos estáticos.
+- **Swagger/OpenAPI autogenerado** desde los DTOs, con exportación automática a `oas/oas.yaml`.
+
+## Tecnologías
+
+| Tecnología | Uso |
+| :--- | :--- |
+| **NestJS 11** | Framework de Node.js modular (Controller → Service → ORM) |
+| **Prisma 6** | ORM y migraciones de base de datos |
+| **MySQL 8** | Motor de base de datos (Docker) |
+| **Passport + passport-jwt** | Estrategia de autenticación JWT |
+| **bcrypt** | Cifrado de contraseñas |
+| **class-validator / class-transformer** | Validación de DTOs |
+| **@nestjs/swagger** | Documentación OpenAPI autogenerada |
+| **Jest** | Pruebas unitarias |
+
+## Requisitos
+
+- **Node.js 20+**
+- **Docker** (para levantar MySQL)
+
+## Puesta en marcha
+
+### 1. Levantar la base de datos
 
 ```bash
-$ npm install
+docker compose up -d
 ```
 
-## Compile and run the project
+### 2. Instalar dependencias
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+npm install
 ```
 
-## Run tests
+### 3. Configurar el entorno
+
+Crear el archivo `.env` (existe `.env.example` como referencia):
+
+```
+DATABASE_URL="mysql://root:desarrollo_software_1@localhost:3306/desarrollo_software_1"
+JWT_SECRET="desarrollo_software_1_secret_key"
+PORT=3000
+```
+
+### 4. Generar el cliente Prisma y las tablas
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx prisma generate
+npx prisma db push
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 5. (Opcional) Sembrar datos estáticos
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run prisma:seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 6. Ejecutar
 
-## Resources
+```bash
+npm run start:dev
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+La API queda disponible en **`http://localhost:3000/api`** y la documentación en **`http://localhost:3000/docs`**.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Comandos útiles
 
-## Support
+| Comando | Descripción |
+| :--- | :--- |
+| `npm run start:dev` | Servidor de desarrollo (watch) |
+| `npm run build` | Compilación de producción |
+| `npm run start:prod` | Ejecutar build de producción |
+| `npm run lint` | Análisis estático con ESLint |
+| `npm test` | Pruebas unitarias (Jest) |
+| `npm run prisma:seed` | Sembrar datos de ejemplo |
+| `npm run prisma:studio` | Abrir Prisma Studio |
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Variables de entorno
 
-## Stay in touch
+| Variable | Descripción |
+| :--- | :--- |
+| `DATABASE_URL` | Cadena de conexión a MySQL |
+| `JWT_SECRET` | Secreto para firmar los tokens JWT |
+| `PORT` | Puerto del servidor (por defecto `3000`) |
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Arquitectura
 
-## License
+```
+src/
+├── auth/                        # Módulo de autenticación
+│   ├── auth.controller.ts       #   Rutas /auth/registro y /auth/login
+│   ├── auth.service.ts          #   Lógica: bcrypt + JWT
+│   ├── auth.module.ts
+│   ├── jwt.strategy.ts          #   Estrategia passport-jwt
+│   ├── jwt-auth.guard.ts        #   Guard que protege rutas con JWT
+│   ├── current-user.decorator.ts#   Inyecta el usuario autenticado
+│   ├── dto/auth.dto.ts          #   DTOs RegisterDto / LoginDto
+│   └── types/auth-user.type.ts
+├── projects/                    # Módulo de proyectos (CRUD)
+│   ├── projects.controller.ts   #   Rutas /api/proyectos (protegidas)
+│   ├── projects.service.ts      #   Lógica de negocio
+│   ├── projects.module.ts
+│   └── dto/project.dto.ts       #   DTOs CreateProjectDto / UpdateProjectDto
+├── prisma/                      # Módulo de persistencia (PrismaService)
+│   ├── prisma.module.ts
+│   └── prisma.service.ts        #   Adaptador inyectable hacia MySQL
+├── config/swagger/              # Configuración de documentación
+│   ├── swagger.ts               #   setupSwagger(): DocumentBuilder + UI
+│   └── oas-exporter.ts          #   Exporta oas/oas.yaml en cada arranque
+├── app.module.ts                # Módulo raíz
+└── main.ts                      # Bootstrap: CORS, prefijo /api, ValidationPipe
+prisma/
+├── schema.prisma                # Modelos Usuario y Proyecto
+└── seed.ts                      # Usuario demo + proyectos estáticos
+oas/
+└── oas.yaml                     # Documento OpenAPI generado automáticamente
+postman/
+├── TechSolutions_Backend.postman_collection.json
+└── TechSolutions_Local.postman_environment.json
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Flujo de datos
+
+```
+HTTP → Controller (DTO validado) → Service (lógica) → PrismaService → MySQL
+```
+
+### Flujo de autenticación
+
+1. El usuario se registra en `/api/auth/registro`; la clave se cifra con **bcrypt** antes de persistir.
+2. En `/api/auth/login` se comparan las credenciales y, si son válidas, se firma un **JWT** (expiración 8 h).
+3. Las rutas de `/api/proyectos` usan `JwtAuthGuard`, que valida la firma y expiración del token; si no es válido responde **401**.
+4. El usuario autenticado se inyecta en la request mediante `@CurrentUser()`, y los proyectos se filtran por su `created_by`.
+
+## Justificación de tecnologías
+
+- **NestJS:** framework de Node.js con arquitectura por módulos e inyección de dependencias, que permite separar controladores (HTTP), servicios (lógica) y la capa de persistencia de forma idiomática y testeable.
+- **Prisma:** ORM con tipado generado a partir del esquema, lo que da seguridad en tiempo de compilación y un flujo sencillo de `schema → migrate/push → client`.
+- **MySQL 8 en Docker:** base de datos relacional requerida por la evaluación, levantada en un contenedor para un entorno reproducible e independiente del sistema operativo.
+- **Passport + passport-jwt:** estándar de la industria para autenticación por JWT; integrado con NestJS mediante guards y estrategias, cumpliendo el rol del "middleware de validación JWT" solicitado (ver nota en Arquitectura).
+- **bcrypt:** cifrado con sal automática de las contraseñas antes de almacenarlas, cumpliendo el requisito de cifrado de datos.
+- **class-validator + ValidationPipe:** validación declarativa de los DTOs en una única capa, con mensajes en español.
+- **@nestjs/swagger:** documentación OpenAPI **autogenerada** desde los DTOs (plugin de compilación), sin mantenimiento manual, y exportada automáticamente a `oas/oas.yaml`.
+
+## Documentación interactiva (Swagger)
+
+La API expone una documentación **OpenAPI autogenerada** en:
+
+```
+http://localhost:3000/docs
+```
+
+Los esquemas de los DTOs (tipos, campos requeridos) se generan automáticamente desde los decoradores de **class-validator** gracias al plugin de `@nestjs/swagger` configurado en `nest-cli.json`. Los endpoints protegidos incluyen un botón **Authorize** para probar el JWT directamente desde la interfaz.
+
+La especificación también se exporta automáticamente como documento YAML en `oas/oas.yaml`, generado por el servidor en cada arranque.
+
+## Endpoints
+
+| Método | Ruta | Descripción | Autenticado |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/auth/registro` | Registro de usuario (clave cifrada con bcrypt) | No |
+| POST | `/api/auth/login` | Inicio de sesión, retorna un JWT | No |
+| GET | `/api/proyectos` | Lista proyectos del usuario | Sí |
+| GET | `/api/proyectos/:id` | Obtiene un proyecto | Sí |
+| POST | `/api/proyectos` | Crea un proyecto | Sí |
+| PATCH | `/api/proyectos/:id` | Actualiza un proyecto | Sí |
+| DELETE | `/api/proyectos/:id` | Elimina un proyecto | Sí |
+
+La autenticación se realiza enviando el token en el header `Authorization: Bearer <token>`.
+
+**Credenciales de prueba** (usuario sembrado):
+
+```
+Correo: demo@techsolutions.cl
+Clave:  demo123456
+```
+
+## Pruebas
+
+Las pruebas unitarias se ejecutan con **Jest**:
+
+```bash
+npm test
+```
+
+Cubren los servicios de `AuthService` (registro, login, cifrado) y `ProjectsService` (CRUD y permisos), junto con el controlador raíz.
+
+## Capturas de pantalla
+
+### Documentación Swagger
+
+![Documentación Swagger](docs/screenshots/01-swagger.png)
+
+---
+
+## Nota sobre el proceso de desarrollo
+
+Este proyecto fue desarrollado con el apoyo de herramientas de inteligencia artificial (el asistente de código `opencode`, basado en el modelo DeepSeek) para agilizar tareas de implementación, refactorización y estructuración del código, además de la redacción de esta documentación y la exploración de buenas prácticas.
+
+El uso de estas herramientas se justifica como un **apoyo a la productividad**, no como un reemplazo del proceso de diseño: la **arquitectura general, las decisiones técnicas y de diseño, la elección de tecnologías y la dirección del proyecto fueron definidas y supervisadas en todo momento por la desarrolladora Gina Norambuena Sánchez**, quien actuó como **arquitecta principal**, validando, corrigiendo y aprobando cada cambio antes de su incorporación al repositorio.
+
+Este esfuerzo forma parte de la formación en desarrollo de software web, donde el dominio de los conceptos y la toma de decisiones fundamentadas son el objetivo central de la evaluación.

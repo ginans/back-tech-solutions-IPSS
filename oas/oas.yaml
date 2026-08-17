@@ -1,0 +1,198 @@
+openapi: 3.0.0
+paths:
+  /api:
+    get:
+      operationId: AppController_getHello
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: string
+      tags:
+        - App
+  /api/auth/registro:
+    post:
+      operationId: AuthController_registro
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+      responses:
+        "201":
+          description: ""
+      tags: &a1
+        - auth
+  /api/auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: ""
+      tags: *a1
+  /api/proyectos:
+    get:
+      operationId: ProjectsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: object
+      security: &a2
+        - bearer: []
+      tags: &a3
+        - proyectos
+    post:
+      operationId: ProjectsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProjectDto"
+      responses:
+        "201":
+          description: ""
+      security: *a2
+      tags: *a3
+  /api/proyectos/{id}:
+    get:
+      operationId: ProjectsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      security: *a2
+      tags: *a3
+    patch:
+      operationId: ProjectsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProjectDto"
+      responses:
+        "200":
+          description: ""
+      security: *a2
+      tags: *a3
+    delete:
+      operationId: ProjectsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      security: *a2
+      tags: *a3
+info:
+  title: Tech Solutions API
+  description: Backend del sistema de gestión de proyectos Tech Solutions.
+    Desarrollado con NestJS, MySQL y Prisma.
+  version: "1.0"
+  contact: {}
+tags:
+  - name: auth
+    description: Registro e inicio de sesión de usuarios
+  - name: proyectos
+    description: CRUD de proyectos (protegido por JWT)
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    RegisterDto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        correo:
+          type: string
+          format: email
+        clave:
+          type: string
+          minLength: 6
+      required:
+        - nombre
+        - correo
+        - clave
+    LoginDto:
+      type: object
+      properties:
+        correo:
+          type: string
+          format: email
+        clave:
+          type: string
+      required:
+        - correo
+        - clave
+    CreateProjectDto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        fechaInicio:
+          type: string
+        estado:
+          type: string
+        responsable:
+          type: string
+        monto:
+          type: number
+          minimum: 0
+      required:
+        - nombre
+        - fechaInicio
+        - estado
+        - responsable
+        - monto
+    UpdateProjectDto:
+      type: object
+      properties:
+        nombre:
+          type: string
+        fechaInicio:
+          type: string
+        estado:
+          type: string
+        responsable:
+          type: string
+        monto:
+          type: number
+          minimum: 0
