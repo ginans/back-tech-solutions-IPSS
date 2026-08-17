@@ -230,3 +230,13 @@ Cubren los servicios de `AuthService` (registro, login, cifrado) y `ProjectsServ
 ### Documentación Swagger
 
 ![Documentación Swagger](docs/screenshots/01-swagger.png)
+
+---
+
+## Nota sobre el proceso de desarrollo
+
+Este proyecto fue desarrollado con el apoyo de herramientas de inteligencia artificial (el asistente de código `opencode`, basado en el modelo DeepSeek) para agilizar tareas de implementación, refactorización y estructuración del código, además de la redacción de esta documentación y la exploración de buenas prácticas.
+
+El uso de estas herramientas se justifica como un **apoyo a la productividad**, no como un reemplazo del proceso de diseño: la **arquitectura general, las decisiones técnicas y de diseño, la elección de tecnologías y la dirección del proyecto fueron definidas y supervisadas en todo momento por la desarrolladora Gina Norambuena Sánchez**, quien actuó como **arquitecta principal**, validando, corrigiendo y aprobando cada cambio antes de su incorporación al repositorio.
+
+Este esfuerzo forma parte de la formación en desarrollo de software web, donde el dominio de los conceptos y la toma de decisiones fundamentadas son el objetivo central de la evaluación.
