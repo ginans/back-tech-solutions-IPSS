@@ -1,28 +1,80 @@
-# Backend - Tech Solutions (Gestión de Proyectos)
+# Tech Solutions — Backend API (Gestión de Proyectos)
 
-Backend desarrollado con **NestJS**, **MySQL**, **Prisma** y **Docker**.
+API backend del sistema de gestión de proyectos para la empresa ficticia **Tech Solutions**, desarrollada con fines académicos para el **Instituto Profesional IPSS** como parte de la **Evaluación Sumativa de la Unidad Nº 2** de la asignatura **Desarrollo de Software Web I — Sección 51**.
+
+| | |
+| :--- | :--- |
+| **Desarrolladora** | Gina Norambuena Sánchez |
+| **Docente** | Boris Belmar |
+| **Asignatura** | Desarrollo de Software Web I — Sección 51 |
+| **Institución** | Instituto Profesional IPSS |
+
+Este repositorio contiene el **backend**. El frontend (Next.js 15) se encuentra en `front-tech-solutions-IPSS`.
+
+---
+
+## Tabla de contenidos
+
+- [Características](#características)
+- [Tecnologías](#tecnologías)
+- [Requisitos](#requisitos)
+- [Puesta en marcha](#puesta-en-marcha)
+- [Variables de entorno](#variables-de-entorno)
+- [Arquitectura](#arquitectura)
+- [Justificación de tecnologías](#justificación-de-tecnologías)
+- [Documentación interactiva (Swagger)](#documentación-interactiva-swagger)
+- [Endpoints](#endpoints)
+- [Pruebas](#pruebas)
+- [Capturas de pantalla](#capturas-de-pantalla)
+
+---
+
+## Características
+
+- **Registro de usuarios** con contraseña cifrada mediante **bcrypt**.
+- **Inicio de sesión** que retorna un **JWT** firmado.
+- **Autenticación por JWT** en las rutas protegidas (`JwtAuthGuard` + passport-jwt).
+- **CRUD de proyectos** (crear, listar, actualizar, eliminar) asociados al usuario autenticado (`created_by`).
+- **Validación de datos** con class-validator (mensajes en español) y `ValidationPipe` global.
+- **Prisma ORM** sobre **MySQL 8** con Docker Compose.
+- **Seed** con usuario demo y proyectos de datos estáticos.
+- **Swagger/OpenAPI autogenerado** desde los DTOs, con exportación automática a `oas/oas.yaml`.
+
+## Tecnologías
+
+| Tecnología | Uso |
+| :--- | :--- |
+| **NestJS 11** | Framework de Node.js modular (Controller → Service → ORM) |
+| **Prisma 6** | ORM y migraciones de base de datos |
+| **MySQL 8** | Motor de base de datos (Docker) |
+| **Passport + passport-jwt** | Estrategia de autenticación JWT |
+| **bcrypt** | Cifrado de contraseñas |
+| **class-validator / class-transformer** | Validación de DTOs |
+| **@nestjs/swagger** | Documentación OpenAPI autogenerada |
+| **Jest** | Pruebas unitarias |
 
 ## Requisitos
 
-- Node.js 20+
-- Docker (para levantar MySQL)
-- npm
+- **Node.js 20+**
+- **Docker** (para levantar MySQL)
 
-## Instalación
+## Puesta en marcha
 
-```bash
-npm install
-```
-
-## Configuración
-
-1. Levantar la base de datos MySQL con Docker:
+### 1. Levantar la base de datos
 
 ```bash
 docker compose up -d
 ```
 
-2. Crear el archivo `.env` (ya viene incluido un `.env.example`):
+### 2. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 3. Configurar el entorno
+
+Crear el archivo `.env` (existe `.env.example` como referencia):
 
 ```
 DATABASE_URL="mysql://root:desarrollo_software_1@localhost:3306/desarrollo_software_1"
@@ -30,26 +82,105 @@ JWT_SECRET="desarrollo_software_1_secret_key"
 PORT=3000
 ```
 
-3. Generar el cliente Prisma y crear las tablas:
+### 4. Generar el cliente Prisma y las tablas
 
 ```bash
 npx prisma generate
 npx prisma db push
 ```
 
-4. (Opcional) Cargar los proyectos con datos estáticos:
+### 5. (Opcional) Sembrar datos estáticos
 
 ```bash
 npm run prisma:seed
 ```
 
-## Ejecución
+### 6. Ejecutar
 
 ```bash
 npm run start:dev
 ```
 
-La API queda disponible en `http://localhost:3000/api`.
+La API queda disponible en **`http://localhost:3000/api`** y la documentación en **`http://localhost:3000/docs`**.
+
+### Comandos útiles
+
+| Comando | Descripción |
+| :--- | :--- |
+| `npm run start:dev` | Servidor de desarrollo (watch) |
+| `npm run build` | Compilación de producción |
+| `npm run start:prod` | Ejecutar build de producción |
+| `npm run lint` | Análisis estático con ESLint |
+| `npm test` | Pruebas unitarias (Jest) |
+| `npm run prisma:seed` | Sembrar datos de ejemplo |
+| `npm run prisma:studio` | Abrir Prisma Studio |
+
+## Variables de entorno
+
+| Variable | Descripción |
+| :--- | :--- |
+| `DATABASE_URL` | Cadena de conexión a MySQL |
+| `JWT_SECRET` | Secreto para firmar los tokens JWT |
+| `PORT` | Puerto del servidor (por defecto `3000`) |
+
+## Arquitectura
+
+```
+src/
+├── auth/                        # Módulo de autenticación
+│   ├── auth.controller.ts       #   Rutas /auth/registro y /auth/login
+│   ├── auth.service.ts          #   Lógica: bcrypt + JWT
+│   ├── auth.module.ts
+│   ├── jwt.strategy.ts          #   Estrategia passport-jwt
+│   ├── jwt-auth.guard.ts        #   Guard que protege rutas con JWT
+│   ├── current-user.decorator.ts#   Inyecta el usuario autenticado
+│   ├── dto/auth.dto.ts          #   DTOs RegisterDto / LoginDto
+│   └── types/auth-user.type.ts
+├── projects/                    # Módulo de proyectos (CRUD)
+│   ├── projects.controller.ts   #   Rutas /api/proyectos (protegidas)
+│   ├── projects.service.ts      #   Lógica de negocio
+│   ├── projects.module.ts
+│   └── dto/project.dto.ts       #   DTOs CreateProjectDto / UpdateProjectDto
+├── prisma/                      # Módulo de persistencia (PrismaService)
+│   ├── prisma.module.ts
+│   └── prisma.service.ts        #   Adaptador inyectable hacia MySQL
+├── config/swagger/              # Configuración de documentación
+│   ├── swagger.ts               #   setupSwagger(): DocumentBuilder + UI
+│   └── oas-exporter.ts          #   Exporta oas/oas.yaml en cada arranque
+├── app.module.ts                # Módulo raíz
+└── main.ts                      # Bootstrap: CORS, prefijo /api, ValidationPipe
+prisma/
+├── schema.prisma                # Modelos Usuario y Proyecto
+└── seed.ts                      # Usuario demo + proyectos estáticos
+oas/
+└── oas.yaml                     # Documento OpenAPI generado automáticamente
+postman/
+├── TechSolutions_Backend.postman_collection.json
+└── TechSolutions_Local.postman_environment.json
+```
+
+### Flujo de datos
+
+```
+HTTP → Controller (DTO validado) → Service (lógica) → PrismaService → MySQL
+```
+
+### Flujo de autenticación
+
+1. El usuario se registra en `/api/auth/registro`; la clave se cifra con **bcrypt** antes de persistir.
+2. En `/api/auth/login` se comparan las credenciales y, si son válidas, se firma un **JWT** (expiración 8 h).
+3. Las rutas de `/api/proyectos` usan `JwtAuthGuard`, que valida la firma y expiración del token; si no es válido responde **401**.
+4. El usuario autenticado se inyecta en la request mediante `@CurrentUser()`, y los proyectos se filtran por su `created_by`.
+
+## Justificación de tecnologías
+
+- **NestJS:** framework de Node.js con arquitectura por módulos e inyección de dependencias, que permite separar controladores (HTTP), servicios (lógica) y la capa de persistencia de forma idiomática y testeable.
+- **Prisma:** ORM con tipado generado a partir del esquema, lo que da seguridad en tiempo de compilación y un flujo sencillo de `schema → migrate/push → client`.
+- **MySQL 8 en Docker:** base de datos relacional requerida por la evaluación, levantada en un contenedor para un entorno reproducible e independiente del sistema operativo.
+- **Passport + passport-jwt:** estándar de la industria para autenticación por JWT; integrado con NestJS mediante guards y estrategias, cumpliendo el rol del "middleware de validación JWT" solicitado (ver nota en Arquitectura).
+- **bcrypt:** cifrado con sal automática de las contraseñas antes de almacenarlas, cumpliendo el requisito de cifrado de datos.
+- **class-validator + ValidationPipe:** validación declarativa de los DTOs en una única capa, con mensajes en español.
+- **@nestjs/swagger:** documentación OpenAPI **autogenerada** desde los DTOs (plugin de compilación), sin mantenimiento manual, y exportada automáticamente a `oas/oas.yaml`.
 
 ## Documentación interactiva (Swagger)
 
@@ -59,36 +190,43 @@ La API expone una documentación **OpenAPI autogenerada** en:
 http://localhost:3000/docs
 ```
 
-Los esquemas de los DTOs (tipos, campos requeridos, mensajes de validación) se generan automáticamente desde los decoradores de **class-validator** gracias al plugin de `@nestjs/swagger` configurado en `nest-cli.json`. Los endpoints protegidos incluyen un botón **Authorize** para probar el JWT directamente desde la interfaz.
+Los esquemas de los DTOs (tipos, campos requeridos) se generan automáticamente desde los decoradores de **class-validator** gracias al plugin de `@nestjs/swagger` configurado en `nest-cli.json`. Los endpoints protegidos incluyen un botón **Authorize** para probar el JWT directamente desde la interfaz.
 
 La especificación también se exporta automáticamente como documento YAML en `oas/oas.yaml`, generado por el servidor en cada arranque.
 
 ## Endpoints
 
-| Método | Ruta                  | Descripción                    | Autenticado |
-| ------ | --------------------- | ------------------------------ | ----------- |
-| POST   | `/api/auth/registro`  | Registro de usuario (clave cifrada con bcrypt) | No |
-| POST   | `/api/auth/login`     | Inicio de sesión, retorna un JWT | No |
-| GET    | `/api/proyectos`      | Lista proyectos del usuario    | Sí |
-| GET    | `/api/proyectos/:id`  | Obtiene un proyecto            | Sí |
-| POST   | `/api/proyectos`      | Crea un proyecto               | Sí |
-| PATCH  | `/api/proyectos/:id`  | Actualiza un proyecto          | Sí |
-| DELETE | `/api/proyectos/:id`  | Elimina un proyecto            | Sí |
+| Método | Ruta | Descripción | Autenticado |
+| :--- | :--- | :--- | :--- |
+| POST | `/api/auth/registro` | Registro de usuario (clave cifrada con bcrypt) | No |
+| POST | `/api/auth/login` | Inicio de sesión, retorna un JWT | No |
+| GET | `/api/proyectos` | Lista proyectos del usuario | Sí |
+| GET | `/api/proyectos/:id` | Obtiene un proyecto | Sí |
+| POST | `/api/proyectos` | Crea un proyecto | Sí |
+| PATCH | `/api/proyectos/:id` | Actualiza un proyecto | Sí |
+| DELETE | `/api/proyectos/:id` | Elimina un proyecto | Sí |
 
 La autenticación se realiza enviando el token en el header `Authorization: Bearer <token>`.
 
-## Arquitectura y decisiones técnicas
-
-El backend se organiza siguiendo la estructura idiomática de **NestJS** por módulos, donde cada módulo separa sus responsabilidades en capas:
+**Credenciales de prueba** (usuario sembrado):
 
 ```
-Controller (HTTP) → Service (lógica de negocio) → PrismaService (persistencia)
+Correo: demo@techsolutions.cl
+Clave:  demo123456
 ```
 
-- **PrismaService** actúa como adaptador de la base de datos y se inyecta como dependencia en los servicios.
-- Los **módulos** (`Auth`, `Projects`, `Prisma`) encapsulan sus propias rutas, controladores, servicios y DTOs.
-- La autenticación se implementa con **Passport/JWT** mediante un `JwtAuthGuard` global por módulo.
+## Pruebas
 
-**Nota sobre la validación de autenticación:** la rúbrica solicita "un middleware que valide si el usuario está autenticado o no por medio de un JWT". En NestJS esta validación se implementa de forma idiomática con un **guard** (`JwtAuthGuard`) junto a la estrategia **passport-jwt**, que cumple exactamente esa función: intercepta cada petición antes de llegar al controlador, verifica la firma y expiración del token y responde `401` si no es válido. Se prefirió este mecanismo por sobre un *middleware* clásico (que en Nest se ejecuta antes que los guards y está pensado para lógica transversal como logging o CORS), ya que el guard permite además inyectar el usuario autenticado en la request (`@CurrentUser()`) y compone correctamente con el resto del framework.
+Las pruebas unitarias se ejecutan con **Jest**:
 
-**Sobre arquitectura hexagonal:** se tiene en mente como evolución natural si el dominio creciera (más casos de uso por entidad, reglas de negocio complejas o necesidad de intercambiar la infraestructura). Para el alcance actual de la evaluación se optó deliberadamente por la estructura de capas de NestJS, que ofrece una separación suficiente sin la sobre-ingeniería que implicaría introducir puertos y adaptadores en un dominio pequeño.
+```bash
+npm test
+```
+
+Cubren los servicios de `AuthService` (registro, login, cifrado) y `ProjectsService` (CRUD y permisos), junto con el controlador raíz.
+
+## Capturas de pantalla
+
+### Documentación Swagger
+
+![Documentación Swagger](docs/screenshots/01-swagger.png)
