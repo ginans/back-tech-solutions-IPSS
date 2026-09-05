@@ -472,7 +472,7 @@
 					]
 				},
 				{
-					"name": "Actualizar proyecto",
+					"name": "Actualizar proyecto (PATCH)",
 					"request": {
 						"method": "PATCH",
 						"header": [
@@ -516,6 +516,50 @@
 					]
 				},
 				{
+					"name": "Actualizar proyecto (PUT)",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombre\": \"App Móvil Delivery Actualizada\",\n  \"estado\": \"En progreso\",\n  \"monto\": 5500000\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/proyectos/{{projectId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["proyectos", "{{projectId}}"]
+						},
+						"description": "Esperado: HTTP 200 OK con los campos actualizados vía PUT (requerimiento U3)."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Estado 200 OK', () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Campos actualizados correctamente vía PUT', () => {",
+									"    const body = pm.response.json();",
+									"    pm.expect(body.nombre).to.eql('App Móvil Delivery Actualizada');",
+									"    pm.expect(body.monto).to.eql(5500000);",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
 					"name": "Eliminar proyecto",
 					"request": {
 						"method": "DELETE",
@@ -530,19 +574,49 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["proyectos", "{{projectId}}"]
 						},
-						"description": "Esperado: HTTP 200 OK con mensaje de eliminación."
+						"description": "Esperado: HTTP 204 No Content con respuesta vacía según rúbrica U3."
 					},
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Estado 200 OK', () => {",
-									"    pm.response.to.have.status(200);",
+									"pm.test('Estado 204 No Content', () => {",
+									"    pm.response.to.have.status(204);",
 									"});",
 									"",
-									"pm.test('Mensaje de eliminación', () => {",
-									"    pm.response.to.have.jsonBody('message', 'Proyecto eliminado correctamente');",
+									"pm.test('Cuerpo de respuesta vacío', () => {",
+									"    pm.expect(pm.response.text()).to.eql('');",
+									"});"
+								]
+							}
+						}
+					]
+				},
+				{
+					"name": "Eliminar proyecto inexistente (404)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/proyectos/{{projectId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["proyectos", "{{projectId}}"]
+						},
+						"description": "Esperado: HTTP 404 Not Found porque el proyecto ya fue eliminado previamente."
+					},
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Estado 404 Not Found', () => {",
+									"    pm.response.to.have.status(404);",
 									"});"
 								]
 							}

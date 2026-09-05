@@ -1,6 +1,6 @@
 # Tech Solutions — Backend API (Gestión de Proyectos)
 
-API backend del sistema de gestión de proyectos para la empresa ficticia **Tech Solutions**, desarrollada con fines académicos para el **Instituto Profesional IPSS** como parte de la **Evaluación Sumativa de la Unidad Nº 2** de la asignatura **Desarrollo de Software Web I — Sección 51**.
+API backend del sistema de gestión de proyectos para la empresa ficticia **Tech Solutions**, desarrollada con fines académicos para el **Instituto Profesional IPSS** como parte de la **Evaluación Sumativa de la Unidad Nº 3** de la asignatura **Desarrollo de Software Web I — Sección 51**.
 
 | | |
 | :--- | :--- |
@@ -195,16 +195,17 @@ Los esquemas de los DTOs (tipos, campos requeridos) se generan automáticamente 
 La especificación también se exporta automáticamente como documento YAML en `oas/oas.yaml`, generado por el servidor en cada arranque.
 
 ## Endpoints
-
-| Método | Ruta | Descripción | Autenticado |
-| :--- | :--- | :--- | :--- |
-| POST | `/api/auth/registro` | Registro de usuario (clave cifrada con bcrypt) | No |
-| POST | `/api/auth/login` | Inicio de sesión, retorna un JWT | No |
-| GET | `/api/proyectos` | Lista proyectos del usuario | Sí |
-| GET | `/api/proyectos/:id` | Obtiene un proyecto | Sí |
-| POST | `/api/proyectos` | Crea un proyecto | Sí |
-| PATCH | `/api/proyectos/:id` | Actualiza un proyecto | Sí |
-| DELETE | `/api/proyectos/:id` | Elimina un proyecto | Sí |
+ 
+| Método | Ruta | Descripción | Código HTTP | Autenticado |
+| :--- | :--- | :--- | :---: | :---: |
+| POST | `/api/auth/registro` | Registro de usuario (clave cifrada con bcrypt) | 201 Created | No |
+| POST | `/api/auth/login` | Inicio de sesión, retorna un JWT | 200 OK | No |
+| GET | `/api/proyectos` | Lista todos los proyectos (arreglo vacío si no hay registros) | 200 OK | Sí |
+| GET | `/api/proyectos/:id` | Obtiene un proyecto por su ID (404 si no existe) | 200 OK | Sí |
+| POST | `/api/proyectos` | Crea un proyecto en la base de datos (campos requeridos) | 201 Created | Sí |
+| PATCH | `/api/proyectos/:id` | Actualización parcial de un proyecto (404 si no existe) | 200 OK | Sí |
+| PUT | `/api/proyectos/:id` | Actualización completa de un proyecto (404 si no existe) | 200 OK | Sí |
+| DELETE | `/api/proyectos/:id` | Elimina un proyecto (404 si no existe, respuesta vacía) | 204 No Content | Sí |
 
 La autenticación se realiza enviando el token en el header `Authorization: Bearer <token>`.
 

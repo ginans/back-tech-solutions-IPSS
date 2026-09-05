@@ -1,6 +1,7 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsDateString,
+  IsDefined,
   IsNotEmpty,
   IsNumber,
   IsOptional,
@@ -9,7 +10,7 @@ import {
 } from 'class-validator';
 
 export class CreateProjectDto {
-  @IsString()
+  @IsString({ message: 'El nombre debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'El nombre es requerido' })
   nombre: string;
 
@@ -17,16 +18,19 @@ export class CreateProjectDto {
   @IsNotEmpty({ message: 'La fecha de inicio es requerida' })
   fechaInicio: string;
 
-  @IsString()
+  @IsString({ message: 'El estado debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'El estado es requerido' })
   estado: string;
 
-  @IsString()
+  @IsString({ message: 'El responsable debe ser una cadena de texto' })
   @IsNotEmpty({ message: 'El responsable es requerido' })
   responsable: string;
 
+  @Transform(({ value }) => (value === '' ? undefined : value))
+  @IsDefined({ message: 'El monto es requerido' })
+  @IsNotEmpty({ message: 'El monto no debe estar vacío' })
   @IsNumber({}, { message: 'El monto debe ser numérico' })
-  @Min(0)
+  @Min(0, { message: 'El monto debe ser mayor o igual a 0' })
   @Type(() => Number)
   monto: number;
 }
@@ -49,8 +53,9 @@ export class UpdateProjectDto {
   responsable?: string;
 
   @IsOptional()
+  @Transform(({ value }) => (value === '' ? undefined : value))
   @IsNumber({}, { message: 'El monto debe ser numérico' })
-  @Min(0)
+  @Min(0, { message: 'El monto debe ser mayor o igual a 0' })
   @Type(() => Number)
   monto?: number;
 }
