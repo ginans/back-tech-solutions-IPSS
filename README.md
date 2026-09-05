@@ -228,9 +228,30 @@ Cubren los servicios de `AuthService` (registro, login, cifrado) y `ProjectsServ
 
 ## Capturas de pantalla
 
-### Documentación Swagger
+### 1. Documentación Swagger (OpenAPI 3.0) con todos los métodos CRUD
+Muestra los endpoints de autenticación y los 6 métodos del controlador de proyectos, incluyendo `PATCH`, `PUT` y `DELETE`.
 
 ![Documentación Swagger](docs/screenshots/01-swagger.png)
+
+### 2. Actualización de proyectos vía PUT (HTTP 200 OK)
+Detalle del endpoint `PUT /api/proyectos/{id}` que permite actualizar todos los campos y responde con el código 200 OK.
+
+![Swagger PUT 200](docs/screenshots/02-swagger-put-200.png)
+
+### 3. Eliminación de proyectos (HTTP 204 No Content)
+Detalle del endpoint `DELETE /api/proyectos/{id}` con código HTTP 204 y respuesta vacía según los requisitos de la rúbrica U3.
+
+![Swagger DELETE 204](docs/screenshots/03-swagger-delete-204.png)
+
+### 4. Ejecución del Plan de Pruebas en Postman Runner
+Pruebas automatizadas de todos los requerimientos: creación (201), búsqueda (200), actualización (200), eliminación (204 vacío), validación de campos vacíos (400) y control de no encontrados (404).
+
+![Plan de Pruebas Postman](docs/screenshots/04-postman-runner.png)
+
+### 5. Pruebas unitarias automatizadas (Jest)
+Ejecución en consola de `npm test -- --verbose` con el 100% de suites y pruebas pasadas (12/12).
+
+![Pruebas Unitarias Jest](docs/screenshots/05-jest-tests.png)
 
 ---
 
