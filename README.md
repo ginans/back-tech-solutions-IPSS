@@ -1,6 +1,6 @@
 # Tech Solutions — Backend API (Gestión de Proyectos)
 
-API backend del sistema de gestión de proyectos para la empresa ficticia **Tech Solutions**, desarrollada con fines académicos para el **Instituto Profesional IPSS** como parte de la **Evaluación Sumativa de la Unidad Nº 2** de la asignatura **Desarrollo de Software Web I — Sección 51**.
+API backend del sistema de gestión de proyectos para la empresa ficticia **Tech Solutions**, desarrollada con fines académicos para el **Instituto Profesional IPSS** como parte de la **Evaluación Sumativa de la Unidad Nº 3** de la asignatura **Desarrollo de Software Web I — Sección 51**.
 
 | | |
 | :--- | :--- |
@@ -195,16 +195,17 @@ Los esquemas de los DTOs (tipos, campos requeridos) se generan automáticamente 
 La especificación también se exporta automáticamente como documento YAML en `oas/oas.yaml`, generado por el servidor en cada arranque.
 
 ## Endpoints
-
-| Método | Ruta | Descripción | Autenticado |
-| :--- | :--- | :--- | :--- |
-| POST | `/api/auth/registro` | Registro de usuario (clave cifrada con bcrypt) | No |
-| POST | `/api/auth/login` | Inicio de sesión, retorna un JWT | No |
-| GET | `/api/proyectos` | Lista proyectos del usuario | Sí |
-| GET | `/api/proyectos/:id` | Obtiene un proyecto | Sí |
-| POST | `/api/proyectos` | Crea un proyecto | Sí |
-| PATCH | `/api/proyectos/:id` | Actualiza un proyecto | Sí |
-| DELETE | `/api/proyectos/:id` | Elimina un proyecto | Sí |
+ 
+| Método | Ruta | Descripción | Código HTTP | Autenticado |
+| :--- | :--- | :--- | :---: | :---: |
+| POST | `/api/auth/registro` | Registro de usuario (clave cifrada con bcrypt) | 201 Created | No |
+| POST | `/api/auth/login` | Inicio de sesión, retorna un JWT | 200 OK | No |
+| GET | `/api/proyectos` | Lista todos los proyectos (arreglo vacío si no hay registros) | 200 OK | Sí |
+| GET | `/api/proyectos/:id` | Obtiene un proyecto por su ID (404 si no existe) | 200 OK | Sí |
+| POST | `/api/proyectos` | Crea un proyecto en la base de datos (campos requeridos) | 201 Created | Sí |
+| PATCH | `/api/proyectos/:id` | Actualización parcial de un proyecto (404 si no existe) | 200 OK | Sí |
+| PUT | `/api/proyectos/:id` | Actualización completa de un proyecto (404 si no existe) | 200 OK | Sí |
+| DELETE | `/api/proyectos/:id` | Elimina un proyecto (404 si no existe, respuesta vacía) | 204 No Content | Sí |
 
 La autenticación se realiza enviando el token en el header `Authorization: Bearer <token>`.
 
@@ -227,15 +228,36 @@ Cubren los servicios de `AuthService` (registro, login, cifrado) y `ProjectsServ
 
 ## Capturas de pantalla
 
-### Documentación Swagger
+### 1. Documentación Swagger (OpenAPI 3.0) con todos los métodos CRUD
+Muestra los endpoints de autenticación y los 6 métodos del controlador de proyectos, incluyendo `PATCH`, `PUT` y `DELETE`.
 
 ![Documentación Swagger](docs/screenshots/01-swagger.png)
+
+### 2. Actualización de proyectos vía PUT (HTTP 200 OK)
+Detalle del endpoint `PUT /api/proyectos/{id}` que permite actualizar todos los campos y responde con el código 200 OK.
+
+![Swagger PUT 200](docs/screenshots/02-swagger-put-200.png)
+
+### 3. Eliminación de proyectos (HTTP 204 No Content)
+Detalle del endpoint `DELETE /api/proyectos/{id}` con código HTTP 204 y respuesta vacía según los requisitos de la rúbrica U3.
+
+![Swagger DELETE 204](docs/screenshots/03-swagger-delete-204.png)
+
+### 4. Ejecución del Plan de Pruebas en Postman Runner
+Pruebas automatizadas de todos los requerimientos: creación (201), búsqueda (200), actualización (200), eliminación (204 vacío), validación de campos vacíos (400) y control de no encontrados (404).
+
+![Plan de Pruebas Postman](docs/screenshots/04-postman-runner.png)
+
+### 5. Pruebas unitarias automatizadas (Jest)
+Ejecución en consola de `npm test -- --verbose` con el 100% de suites y pruebas pasadas (12/12).
+
+![Pruebas Unitarias Jest](docs/screenshots/05-jest-tests.png)
 
 ---
 
 ## Nota sobre el proceso de desarrollo
 
-Este proyecto fue desarrollado con el apoyo de herramientas de inteligencia artificial (el asistente de código `opencode`, basado en el modelo DeepSeek) para agilizar tareas de implementación, refactorización y estructuración del código, además de la redacción de esta documentación y la exploración de buenas prácticas.
+Este proyecto fue desarrollado con el apoyo de herramientas de inteligencia artificial (el asistente de código `opencode` basado en el modelo DeepSeek y el asistente `Gemini` de Google) para agilizar tareas de implementación, refactorización y estructuración del código, además de la redacción de esta documentación y la exploración de buenas prácticas.
 
 El uso de estas herramientas se justifica como un **apoyo a la productividad**, no como un reemplazo del proceso de diseño: la **arquitectura general, las decisiones técnicas y de diseño, la elección de tecnologías y la dirección del proyecto fueron definidas y supervisadas en todo momento por la desarrolladora Gina Norambuena Sánchez**, quien actuó como **arquitecta principal**, validando, corrigiendo y aprobando cada cambio antes de su incorporación al repositorio.
 

@@ -79,6 +79,28 @@ describe('ProjectsService', () => {
   });
 
   describe('update/remove', () => {
+    it('debe actualizar un proyecto correctamente retornando los campos actualizados', async () => {
+      prisma.proyecto.findUnique.mockResolvedValue(proyectoEjemplo);
+      const proyectoActualizado = { ...proyectoEjemplo, nombre: 'Sistema Modificado', monto: 3000000 };
+      prisma.proyecto.update.mockResolvedValue(proyectoActualizado);
+
+      const result = await service.update(1, 1, { nombre: 'Sistema Modificado', monto: 3000000 });
+
+      expect(prisma.proyecto.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: expect.objectContaining({ nombre: 'Sistema Modificado', monto: 3000000 }),
+      });
+      expect(result).toEqual(proyectoActualizado);
+    });
+
+    it('debe eliminar un proyecto correctamente retornando void', async () => {
+      prisma.proyecto.findUnique.mockResolvedValue(proyectoEjemplo);
+      prisma.proyecto.delete.mockResolvedValue(proyectoEjemplo);
+
+      await expect(service.remove(1, 1)).resolves.toBeUndefined();
+      expect(prisma.proyecto.delete).toHaveBeenCalledWith({ where: { id: 1 } });
+    });
+
     it('debe impedir modificar un proyecto de otro usuario', async () => {
       prisma.proyecto.findUnique.mockResolvedValue(proyectoEjemplo);
 
@@ -89,10 +111,12 @@ describe('ProjectsService', () => {
       await expect(service.remove(1, 999)).rejects.toThrow(ForbiddenException);
     });
 
-    it('debe lanzar not found si el proyecto no existe', async () => {
+    it('debe lanzar not found si el proyecto no existe al consultar, actualizar o eliminar', async () => {
       prisma.proyecto.findUnique.mockResolvedValue(null);
 
       await expect(service.findOne(99, 1)).rejects.toThrow(NotFoundException);
+      await expect(service.update(99, 1, { nombre: 'Nuevo' })).rejects.toThrow(NotFoundException);
+      await expect(service.remove(99, 1)).rejects.toThrow(NotFoundException);
     });
   });
 });

@@ -49,12 +49,10 @@ export class ProjectsService {
     });
   }
 
-  async remove(id: number, userId: number) {
+  async remove(id: number, userId: number): Promise<void> {
     await this.findOwned(id, userId);
 
     await this.prisma.proyecto.delete({ where: { id } });
-
-    return { message: 'Proyecto eliminado correctamente' };
   }
 
   private async findOwned(id: number, userId: number) {

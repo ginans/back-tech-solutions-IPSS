@@ -48,13 +48,10 @@ paths:
       parameters: []
       responses:
         "200":
-          description: ""
-          content:
-            application/json:
-              schema:
-                type: object
+          description: Lista de proyectos obtenida correctamente
       security: &a2
         - bearer: []
+      summary: Búsqueda de todos los proyectos
       tags: &a3
         - proyectos
     post:
@@ -68,8 +65,11 @@ paths:
               $ref: "#/components/schemas/CreateProjectDto"
       responses:
         "201":
-          description: ""
+          description: Proyecto creado exitosamente
+        "400":
+          description: Datos inválidos o campos requeridos vacíos
       security: *a2
+      summary: Creación de un proyecto en la Base de Datos
       tags: *a3
   /api/proyectos/{id}:
     get:
@@ -82,8 +82,11 @@ paths:
             type: number
       responses:
         "200":
-          description: ""
+          description: Proyecto encontrado con todos los campos
+        "404":
+          description: Proyecto no encontrado
       security: *a2
+      summary: Búsqueda de un proyecto por su ID
       tags: *a3
     patch:
       operationId: ProjectsController_update
@@ -101,8 +104,33 @@ paths:
               $ref: "#/components/schemas/UpdateProjectDto"
       responses:
         "200":
-          description: ""
+          description: Proyecto actualizado con todos los campos
+        "404":
+          description: Proyecto no encontrado
       security: *a2
+      summary: Actualizar un proyecto por su ID (HTTP PATCH)
+      tags: *a3
+    put:
+      operationId: ProjectsController_updatePut
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProjectDto"
+      responses:
+        "200":
+          description: Proyecto actualizado con todos los campos
+        "404":
+          description: Proyecto no encontrado
+      security: *a2
+      summary: Actualizar un proyecto por su ID (HTTP PUT)
       tags: *a3
     delete:
       operationId: ProjectsController_remove
@@ -113,9 +141,12 @@ paths:
           schema:
             type: number
       responses:
-        "200":
-          description: ""
+        "204":
+          description: Proyecto eliminado correctamente (respuesta vacía)
+        "404":
+          description: Proyecto no encontrado
       security: *a2
+      summary: Eliminar un proyecto por su ID
       tags: *a3
 info:
   title: Tech Solutions API
